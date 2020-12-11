@@ -1,0 +1,1128 @@
+{
+	"info": {
+		"_postman_id": "b95371c2-f278-4290-b4e2-8abdfca824bc",
+		"name": "Stargate Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authenticate",
+			"item": [
+				{
+					"name": "Get an Auth Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bd15479f-d361-473c-a07c-4a00e6738ae5",
+								"exec": [
+									"var responseBody = JSON.parse(responseBody);",
+									"pm.environment.set(\"token\", responseBody.authToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v1/auth",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v1",
+								"auth"
+							]
+						},
+						"description": "Get an authentication Token"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "REST API",
+			"item": [
+				{
+					"name": "Create Table with REST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"columnDefinitions\": [\n        {\n            \"name\": \"id\",\n            \"typeDefinition\": \"int\"\n        },\n        {\n            \"name\": \"firstname\",\n            \"typeDefinition\": \"text\"\n        },\n        {\n            \"name\": \"lastname\",\n            \"typeDefinition\": \"text\"\n        },\n        {\n            \"name\": \"age\",\n            \"typeDefinition\": \"int\"\n        },\n        {\n            \"name\": \"affiliation\",\n            \"typeDefinition\": \"map <text,text>\"\n        },\n        {\n            \"name\": \"country\",\n            \"typeDefinition\": \"text\"\n        },\n        {\n            \"name\": \"registration\",\n            \"typeDefinition\": \"date\"\n        }\n    ],\n    \"primaryKey\": {\"partitionKey\": [\"id\"]},\n    \"tableOptions\": {\"defaultTimeToLive\": 0},\n    \"name\": \"cyclist_semi_pro\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v1/keyspaces/{{keyspace}}/tables",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v1",
+								"keyspaces",
+								"{{keyspace}}",
+								"tables"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert data into table",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"columns\": [\n        {\n            \"name\": \"id\",\n            \"value\": \"3\"\n        },\n        {\n            \"name\": \"firstname\",\n            \"value\": \"Joe\"\n        },\n        {\n            \"name\": \"lastname\",\n            \"value\": \"Harwell\"\n        },\n        {\n            \"name\": \"age\",\n            \"value\": \"31\"\n        },\n        {\n            \"name\": \"affiliation\",\n            \"value\": \"{name: Rotar Club, city: Dallas, members:5100, fee:499}\"\n        },\n        {\n            \"name\": \"country\",\n            \"value\": \"FRA\"\n        },\n        {\n            \"value\": \"2020-07-22\",\n            \"name\": \"registration\"\n        }\n    ]}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v1/keyspaces/{{keyspace}}/tables/{{table}}/rows/",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v1",
+								"keyspaces",
+								"{{keyspace}}",
+								"tables",
+								"{{table}}",
+								"rows",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Rows",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "key",
+									"value": "X-Cassandra-Token",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v1/keyspaces/{{keyspace}}/tables/{{table}}/rows/4",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v1",
+								"keyspaces",
+								"{{keyspace}}",
+								"tables",
+								"{{table}}",
+								"rows",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Queries",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"columnNames\": [\"id\", \"firstname\", \"lastname\",\"age\"],\n    \"filters\": [\n        {\n            \"value\": [\"1\"],\n            \"columnName\": \"id\",\n            \"operator\": \"eq\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v1/keyspaces/{{keyspace}}/tables/{{table}}/rows/query",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v1",
+								"keyspaces",
+								"{{keyspace}}",
+								"tables",
+								"{{table}}",
+								"rows",
+								"query"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Rows",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"changeset\": [\n        {\n            \"column\": \"firstname\",\n            \"value\": \"David\"\n        },\n        {\n            \"column\": \"lastname\",\n            \"value\": \"Joy\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v1/keyspaces/{{keyspace}}/tables/{{table}}/rows/2",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v1",
+								"keyspaces",
+								"{{keyspace}}",
+								"tables",
+								"{{table}}",
+								"rows",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Rows",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v1/keyspaces/{{keyspace}}/tables/{{table}}/rows/3",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v1",
+								"keyspaces",
+								"{{keyspace}}",
+								"tables",
+								"{{table}}",
+								"rows",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Document API",
+			"item": [
+				{
+					"name": "Create a Game Document",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f665e4f1-6cc6-4cfd-97d1-69fba352f9bc",
+								"exec": [
+									"var responseBody = JSON.parse(responseBody);",
+									"pm.environment.set(\"documentId\", responseBody.documentId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"gameCode\": \"HOCKEY\",\n    \"currentState\": {\n        \"name\": \"ADD_PLAYERS\",\n        \"roundId\": null\n    },\n    \"players\": {\"1\": {\n            \"name\": \"CRW- new\",\n            \"score\": 100\n    }},\n    \"audienceSize\": 50,\n    \"rounds\": {\n        \"1\": {\n            \"type\": \"QUESTION\",\n            \"title\": \"Round 1\",\n            \"scoreMultiplier\": 1\n        },\n        \"2\": {\n            \"type\": \"QUESTION\",\n            \"title\": \"Round 1\",\n            \"scoreMultiplier\": 2\n        },\n        \"3\": {\n            \"type\": \"COMIC\",\n            \"title\": \"Final Round\",\n            \"scoreMultiplier\": 3\n        }\n    },\n    \"questions\": {\n        \"6\": {\n            \"roundId\": 1,\n            \"content\": \"Custom Question\"\n        },\n        \"2\": {\n            \"roundId\": 2,\n            \"content\": \"What day is it?\"\n        },\n        \"3\": {\n            \"roundId\": 3,\n            \"content\": \"https://xkcd.com/386/\"\n        }\n    },\n    \"answers\": {},\n    \"votes\": {},\n    \"audienceVotes\": {},\n    \"start-time-new\" : 1607471624,\n    \"status\" : \"complete\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v2/namespaces/{{keyspace}}/collections/games/100",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v2",
+								"namespaces",
+								"{{keyspace}}",
+								"collections",
+								"games",
+								"100"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch a Specific Document of known id",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v2/namespaces/{{keyspace}}/collections/games/100",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v2",
+								"namespaces",
+								"{{keyspace}}",
+								"collections",
+								"games",
+								"100"
+							]
+						},
+						"description": "Update the ID env variable to fetch a document with a specific Docuemnt ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create a Game Document POST (use PUT)",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"gameCode\": \"DANG\",\n    \"currentState\": {\n        \"name\": \"ADD_PLAYERS\",\n        \"roundId\": null\n    },\n    \"players\": {},\n    \"audienceSize\": 0,\n    \"rounds\": {\n        \"1\": {\n            \"type\": \"QUESTION\",\n            \"title\": \"Round 1\",\n            \"scoreMultiplier\": 1\n        },\n        \"2\": {\n            \"type\": \"QUESTION\",\n            \"title\": \"Round 1\",\n            \"scoreMultiplier\": 2\n        },\n        \"3\": {\n            \"type\": \"COMIC\",\n            \"title\": \"Final Round\",\n            \"scoreMultiplier\": 3\n        }\n    },\n    \"questions\": {\n        \"1\": {\n            \"roundId\": 1,\n            \"content\": \"What time is it?\"\n        },\n        \"2\": {\n            \"roundId\": 2,\n            \"content\": \"What day is it?\"\n        },\n        \"3\": {\n            \"roundId\": 3,\n            \"content\": \"https://xkcd.com/386/\"\n        }\n    },\n    \"answers\": {},\n    \"votes\": {},\n    \"audienceVotes\": {}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v2/namespaces/{{keyspace}}/collections/games",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v2",
+								"namespaces",
+								"{{keyspace}}",
+								"collections",
+								"games"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch a sub-document within a Specific Document of known id",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v2/namespaces/{{keyspace}}/collections/games/100/votes",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v2",
+								"namespaces",
+								"{{keyspace}}",
+								"collections",
+								"games",
+								"100",
+								"votes"
+							]
+						},
+						"description": "Update the ID env variable to fetch a document with a specific Docuemnt ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update the Votes Subdocument",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"1\": {\n        \"playerId\": \"CRW\"\n    },\n    \"2\": {\n        \"playerId\": \"DKG\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v2/namespaces/{{keyspace}}/collections/games/100/votes",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v2",
+								"namespaces",
+								"{{keyspace}}",
+								"collections",
+								"games",
+								"100",
+								"votes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch All Documents in a Collection",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {},
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v2/namespaces/{{keyspace}}/collections/games/?page-size=5&fields=[\"documentId\",\"gameCode\"]",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v2",
+								"namespaces",
+								"{{keyspace}}",
+								"collections",
+								"games",
+								""
+							],
+							"query": [
+								{
+									"key": "page-size",
+									"value": "5"
+								},
+								{
+									"key": "page-state",
+									"value": "AzEwMBP%2FVVVVVVVVVVQFdm90ZXPhVVVV8H%2F%2F%2F9Dwf%2F%2F%2F6A%3D%3D",
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "[\"documentId\",\"gameCode\"]"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search across the entire Collection",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "where",
+								"value": "",
+								"type": "text"
+							},
+							{
+								"key": "page-size",
+								"value": "10",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v2/namespaces/{{keyspace}}/collections/games/?where={\"status\" : { \"$eq\" : \"HOCKEY\" }}&page-size=2&fields=[\"gameCode\",\"status\",\"questions\"]",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v2",
+								"namespaces",
+								"{{keyspace}}",
+								"collections",
+								"games",
+								""
+							],
+							"query": [
+								{
+									"key": "where",
+									"value": "{\"status\" : { \"$eq\" : \"HOCKEY\" }}"
+								},
+								{
+									"key": "page-size",
+									"value": "2"
+								},
+								{
+									"key": "fields",
+									"value": "[\"gameCode\",\"status\",\"questions\"]"
+								},
+								{
+									"key": "where",
+									"value": "{ \"questions.*.roundId\" : { \"$gt\" : 5} }",
+									"disabled": true
+								},
+								{
+									"key": "where",
+									"value": "{ \"audienceSize\" : { \"$gt\" : 50 } }",
+									"disabled": true
+								},
+								{
+									"key": "where",
+									"value": "{ \"start-time-new\" : { \"$nptexists\" : true} }",
+									"disabled": true
+								},
+								{
+									"key": "page-state",
+									"value": "AzEwMBP%2FVVVVVVVVVVQFdm90ZXPhVVVV8H%2F%2F%2F9Dwf%2F%2F%2F6A%3D%3D",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Update the ID env variable to fetch a document with a specific Docuemnt ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a Game Document",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-Cassandra-Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/rest/v2/namespaces/{{keyspace}}/collections/games/104",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"rest",
+								"v2",
+								"namespaces",
+								"{{keyspace}}",
+								"collections",
+								"games",
+								"104"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "GraphQL API",
+			"item": [
+				{
+					"name": "Retrieve Schema information",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cassandra-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetTables {\n  keyspace(name: \"remotetelemetry\") {\n      name\n      tables {\n          name\n          columns {\n              name\n              kind\n              type {\n                  basic\n                  info {\n                      name\n                  }\n              }\n          }\n      }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/graphql-schema",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"graphql-schema"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Data using GQL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cassandra-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  cyclist_semi_pro(value: { id: 4 }) {\n    values {\n      id\n      firstname\n      lastname\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/graphql/{{keyspace}}",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"graphql",
+								"{{keyspace}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert Data using GQL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cassandra-token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation cyclist_semi_pro {\n  i1: insertcyclist_semi_pro(value: {id:1,firstname:\"JJ\",lastname:\"JACK\",age:31,country:\"FRA\",registration:\"2020-07-22\"}) {\n    value {\n      id\n      firstname\n      lastname\n      age\n      country\n      registration\n    }\n  }\n  i2: insertcyclist_semi_pro(value: {id:4,firstname:\"Joe\",lastname:\"Harwell\",age:31,country:\"FRA\",registration:\"2020-07-22\"}) {\n    value {\n      id\n      firstname\n      lastname\n      age\n      country\n      registration\n    }\n  }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/graphql/{{keyspace}}",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"graphql",
+								"{{keyspace}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Data using GQL wt Pagination",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cassandra-token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  cyclist_semi_pro(options:{pageSize: 1, pageState: \"BAAAAAEA8H////4A\" }) {\n    values {\n      id\n      firstname\n      lastname\n      age\n      affiliation\n      country\n    }\n    pageState\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/graphql/{{keyspace}}",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"graphql",
+								"{{keyspace}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve using Aliases",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cassandra-token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "{\n  ESM : cyclist_semi_pro(value: { id: 1 }) {\n      values {\n      firstname}\n  }\n  DA: cyclist_semi_pro(value: { id: 2 }) {\n      values {\n      firstname}\n  }\n}\n",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/graphql/{{keyspace}}",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"graphql",
+								"{{keyspace}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve using Fragments (WIP - Don't use)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cassandra-token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "{\n  leftComparison: cyclist_semi_pro(value: { id: 1 }) {\n    ...nameparts\n  }\n}\n\nfragment nameparts on null {\n  firstname\n  lastname\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/graphql/{{keyspace}}",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"graphql",
+								"{{keyspace}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update row using GQL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cassandra-token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation cyclist_semi_pro {\n  update: updatecyclist_semi_pro(value: {id:1, firstname:\"Herman\"},ifExists: true ) { \n    value {\n      id\n      firstname\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/graphql/{{keyspace}}",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"graphql",
+								"{{keyspace}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete row using GQL",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cassandra-token",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation cyclist_semi_pro {\n  del: deletecyclist_semi_pro(value: {id:2}, ifExists: true ) {\n    value {\n      id\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "https://{{db}}-{{region}}.apps.astra.datastax.com/api/graphql/{{keyspace}}",
+							"protocol": "https",
+							"host": [
+								"{{db}}-{{region}}",
+								"apps",
+								"astra",
+								"datastax",
+								"com"
+							],
+							"path": [
+								"api",
+								"graphql",
+								"{{keyspace}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "eb718f91-fb0a-46e2-81fa-72985db17747",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "13a3de26-970a-40ea-9bec-77f2dcdf607a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "ebed33c4-36f5-49fe-af77-ebf838c0765f",
+			"key": "region",
+			"value": ""
+		},
+		{
+			"id": "ef41da28-5699-498e-97fe-7907748535bc",
+			"key": "db",
+			"value": ""
+		},
+		{
+			"id": "5d757458-20f6-490b-91a1-8e2751b1e407",
+			"key": "username",
+			"value": ""
+		},
+		{
+			"id": "f3373b9b-b0c5-4d8c-9296-8f2c9c33b89d",
+			"key": "password",
+			"value": ""
+		},
+		{
+			"id": "77d8bb42-9d1b-46de-b25b-8320ffd7000e",
+			"key": "keyspace",
+			"value": ""
+		},
+		{
+			"id": "25c2cc15-7949-4abb-ae98-255db2e04ec1",
+			"key": "token",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}
